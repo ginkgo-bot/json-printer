@@ -32,18 +32,18 @@
 #include <type_traits>
 
 
-class JsonPrinter {
+class json_printer {
 public:
     enum container_type { object, array };
 
-    JsonPrinter(std::ostream &os = std::cout, bool pretty = false,
+    json_printer(std::ostream &os = std::cout, bool pretty = false,
                 int indent = 2)
         : os_(os), pretty_(pretty), indent_(indent), have_separator_(true)
     {
         print(object);
     }
 
-    ~JsonPrinter()
+    ~json_printer()
     {
         while (!nesting_info_.empty()) {
             finalize();
@@ -51,7 +51,7 @@ public:
     }
 
     template <typename T>
-    JsonPrinter &print(const T &value)
+    json_printer &print(const T &value)
     {
         if (!nesting_info_.empty() && nesting_info_.top() == object) {
             throw std::runtime_error("Need name for object member");
@@ -64,7 +64,7 @@ public:
     }
 
     template <typename T>
-    JsonPrinter &print(const std::string &name, const T &value)
+    json_printer &print(const std::string &name, const T &value)
     {
         if (nesting_info_.empty() || nesting_info_.top() == array) {
             throw std::runtime_error("Cannot set name for array element");
@@ -78,7 +78,7 @@ public:
         return *this;
     }
 
-    JsonPrinter &finalize()
+    json_printer &finalize()
     {
         const auto t = nesting_info_.top();
         nesting_info_.pop();
