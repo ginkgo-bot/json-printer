@@ -26,6 +26,7 @@
 #define JSON_PRINTER_HPP_
 
 
+#include <cstddef>
 #include <ostream>
 #include <stack>
 #include <type_traits>
@@ -92,7 +93,7 @@ private:
     void start_print()
     {
         if (!have_separator_) {
-            os_ << (pretty_ ? ", " : ",");
+            os_ << ',';
             have_separator_ = true;
         }
         if (need_newline_) {
@@ -143,6 +144,8 @@ private:
     }
 
     void escape_and_print(bool value) { os_ << (value ? "true" : "false"); }
+
+    void escape_and_print(nullptr_t) { os_ << "null"; }
 
     void escape_and_print(container_type t)
     {

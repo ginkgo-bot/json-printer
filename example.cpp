@@ -7,7 +7,7 @@
 
 int main()
 {
-    const auto pretty_print = false;  // trade output size for readability
+    const auto pretty_print = true;  // trade output size for readability
     const auto indent = 2;           // indentation level when pretty-printing
     JsonPrinter out(std::cout, pretty_print, indent);
 
@@ -42,5 +42,7 @@ int main()
         out.print(std::string("GTX") + std::to_string(num));
     }
     out.finalize();
-}
 
+    // and let's forget all about Quadros
+    out.print("Quadro", nullptr);
+}
