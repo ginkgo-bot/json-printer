@@ -12,10 +12,12 @@ int main()
     JsonPrinter out(std::cout, pretty_print, indent);
 
     out.print("Tesla", JsonPrinter::array);
-        out.print(JsonPrinter::object);
-            out.print("name", "K20");
+        out.print(JsonPrinter::object);  // inside array, pass just the value
+            out.print("name", "K20");    // inside object, pass name & value
+            // out.print("K20")             error: need name inside of object
             out.print("cores", 2496);
         out.finalize();
+        // out.print("name", "value");      error: can't have name in array
     // you can also chain the calls
         out.print(JsonPrinter::object)
             .print("name", "K40")
@@ -35,14 +37,13 @@ int main()
         .finalize()
     .finalize();
 
-    // let's just list a couple of GeForce's
+    // let's just list a couple of GeForces
     out.print("GeForce", JsonPrinter::array);
-    for (auto num : {960, 970, 980, 1050, 1060, 1070, 1080})
-    {
+    for (auto num : {960, 970, 980, 1050, 1060, 1070, 1080}) {
         out.print(std::string("GTX") + std::to_string(num));
     }
     out.finalize();
 
-    // and let's forget all about Quadros
+    // and forget all about Quadros
     out.print("Quadro", nullptr);
 }

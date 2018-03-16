@@ -27,7 +27,7 @@
 
 
 #include <cstddef>
-#include <ostream>
+#include <iostream>
 #include <stack>
 #include <type_traits>
 
@@ -36,7 +36,8 @@ class JsonPrinter {
 public:
     enum container_type { object, array };
 
-    JsonPrinter(std::ostream &os, bool pretty = false, int indent = 2)
+    JsonPrinter(std::ostream &os = std::cout, bool pretty = false,
+                int indent = 2)
         : os_(os), pretty_(pretty), indent_(indent), have_separator_(true)
     {
         print(object);
