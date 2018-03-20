@@ -28,8 +28,12 @@
 
 #include <cstddef>
 #include <iostream>
+#include <sstream>
 #include <stack>
 #include <type_traits>
+
+
+namespace jpr {
 
 
 class json_printer {
@@ -37,8 +41,9 @@ public:
     enum container_type { object, array };
 
     json_printer(std::ostream &os = std::cout, bool pretty = false,
-                int indent = 2)
-        : os_(os), pretty_(pretty), indent_(indent), have_separator_(true)
+                int indent = 2, int base_nesting = 0)
+        : os_(os), pretty_(pretty), indent_(indent),
+          base_nesting_(base_nesting), have_separator_(true)
     {
         print(object);
     }
@@ -90,6 +95,8 @@ public:
         return *this;
     }
 
+    std::ostream &ostream() noexcept { return os_; }
+
 private:
     void start_print()
     {
@@ -129,37 +136,98 @@ private:
     }
 
     template <typename T>
-    typename std::enable_if<!std::is_integral<T>::value &&
-                            !std::is_floating_point<T>::value>::type
-    escape_and_print(const T &value)
-    {
-        os_ << '"' << value << '"';
-    }
-
-    template <typename T>
-    typename std::enable_if<std::is_integral<T>::value ||
-                            std::is_floating_point<T>::value>::type
-    escape_and_print(const T &value)
-    {
-        os_ << value;
-    }
-
-    void escape_and_print(bool value) { os_ << (value ? "true" : "false"); }
-
-    void escape_and_print(nullptr_t) { os_ << "null"; }
-
-    void escape_and_print(container_type t)
-    {
-        os_ << (t == object ? '{' : '[');
-    }
+    inline void escape_and_print(const T &value);
 
     std::ostream &os_;
     bool pretty_;
     int indent_;
+    int base_nesting_;
     bool have_separator_;
     bool need_newline_;
     std::stack<container_type> nesting_info_;
 };
+
+
+namespace detail {
+
+
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value ||
+                        std::is_floating_point<T>::value>::type
+print_as_json(json_printer &printer, T value)
+{
+    printer.ostream() << value;
+}
+
+void print_as_json(json_printer &printer, const std::string &value)
+{
+    auto &os = printer.ostream();
+    os << '"';
+    for (const auto c : value) {
+        switch (c) {
+            case '\\': os << "\\\\"; break;
+            case '\"': os << "\\\""; break;
+            default: os << c;
+        }
+    }
+    os << '"';
+}
+
+void print_as_json(json_printer &printer, const char *value)
+{
+    print_as_json(printer, std::string(value));
+}
+
+void print_as_json(json_printer &printer, bool value)
+{ printer.ostream() << (value ? "true" : "false"); }
+
+void print_as_json(json_printer &printer, std::nullptr_t) { printer.ostream() << "null"; }
+
+void print_as_json(json_printer &printer, json_printer::container_type t)
+{
+    printer.ostream() << (t == json_printer::object ? '{' : '[');
+}
+
+
+template <typename...>
+using void_t = void;
+
+
+template <typename T, typename = void>
+struct have_custom_printer : std::false_type {};
+
+template <typename T>
+struct have_custom_printer<T, void_t<decltype(print_as_json(std::declval<json_printer&>(), std::declval<T>()))>> : std::true_type {};
+
+
+template <typename T>
+typename std::enable_if<have_custom_printer<T>::value>::type
+escape_and_print_impl(json_printer &printer, const T &value)
+{
+    print_as_json(printer, value);
+}
+
+template <typename T>
+typename std::enable_if<!have_custom_printer<T>::value>::type
+escape_and_print_impl(json_printer &printer, const T &value)
+{
+    std::ostringstream ss;
+    ss << value;
+    print_as_json(printer, ss.str());
+}
+
+
+}  // namespace detail
+
+
+template <typename T>
+void json_printer::escape_and_print(const T &value)
+{
+    detail::escape_and_print_impl(*this, value);
+}
+
+
+}  // namespace jpr
 
 
 #endif  // JSON_PRINTER_HPP_

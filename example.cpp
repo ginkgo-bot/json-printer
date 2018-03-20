@@ -7,6 +7,7 @@
 
 int main()
 {
+    using json_printer = jpr::json_printer;
     const auto pretty_print = true;  // trade output size for readability
     const auto indent = 2;           // indentation level when pretty-printing
     json_printer out(std::cout, pretty_print, indent);
