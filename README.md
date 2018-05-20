@@ -1,6 +1,8 @@
 JSON printer
 ============
 
+[![pipeline status](https://gitlab.com/gflegar/json-printer-ci/badges/master/pipeline.svg)](https://gitlab.com/gflegar/json-printer-ci/commits/master)
+
 JSON printer is a header-only C++11 library for printing JSON objects to C++
 streams.
 It tries to follow the KISS principle, so the entire library consists of 1

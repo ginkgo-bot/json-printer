@@ -1,0 +1,34 @@
+{
+  "Tesla" : [
+    {
+      "name" : "K20",
+      "cores" : 2496
+    },
+    {
+      "name" : "K40",
+      "cores" : 2880
+    },
+    {
+      "name" : "K80",
+      "cores" : 4992
+    },
+    {
+      "name" : "P100",
+      "cores" : 3584
+    },
+    {
+      "name" : "V100",
+      "cores" : 5120
+    }
+  ],
+  "GeForce" : [
+    "GTX960",
+    "GTX970",
+    "GTX980",
+    "GTX1050",
+    "GTX1060",
+    "GTX1070",
+    "GTX1080"
+  ],
+  "Quadro" : null
+}

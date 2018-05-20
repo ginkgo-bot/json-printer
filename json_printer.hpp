@@ -41,9 +41,12 @@ public:
     enum container_type { object, array };
 
     json_printer(std::ostream &os = std::cout, bool pretty = false,
-                int indent = 2, int base_nesting = 0)
-        : os_(os), pretty_(pretty), indent_(indent),
-          base_nesting_(base_nesting), have_separator_(true)
+                 int indent = 2, int base_nesting = 0)
+        : os_(os),
+          pretty_(pretty),
+          indent_(indent),
+          base_nesting_(base_nesting),
+          have_separator_(true)
     {
         print(object);
     }
@@ -165,9 +168,14 @@ void print_as_json(json_printer &printer, const std::string &value)
     os << '"';
     for (const auto c : value) {
         switch (c) {
-            case '\\': os << "\\\\"; break;
-            case '\"': os << "\\\""; break;
-            default: os << c;
+        case '\\':
+            os << "\\\\";
+            break;
+        case '\"':
+            os << "\\\"";
+            break;
+        default:
+            os << c;
         }
     }
     os << '"';
@@ -179,9 +187,14 @@ void print_as_json(json_printer &printer, const char *value)
 }
 
 void print_as_json(json_printer &printer, bool value)
-{ printer.ostream() << (value ? "true" : "false"); }
+{
+    printer.ostream() << (value ? "true" : "false");
+}
 
-void print_as_json(json_printer &printer, std::nullptr_t) { printer.ostream() << "null"; }
+void print_as_json(json_printer &printer, std::nullptr_t)
+{
+    printer.ostream() << "null";
+}
 
 void print_as_json(json_printer &printer, json_printer::container_type t)
 {
@@ -197,7 +210,9 @@ template <typename T, typename = void>
 struct have_custom_printer : std::false_type {};
 
 template <typename T>
-struct have_custom_printer<T, void_t<decltype(print_as_json(std::declval<json_printer&>(), std::declval<T>()))>> : std::true_type {};
+struct have_custom_printer<
+    T, void_t<decltype(print_as_json(std::declval<json_printer &>(),
+                                     std::declval<T>()))>> : std::true_type {};
 
 
 template <typename T>

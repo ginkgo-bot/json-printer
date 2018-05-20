@@ -1,0 +1,15 @@
+image: base/devel
+
+build:
+  stage: build
+  script:
+    - g++ -o example example.cpp
+  artifacts:
+    paths:
+      - example
+
+test:
+  stage: test
+  script:
+    - ./example >out.json
+    - diff out.json example_result.json
